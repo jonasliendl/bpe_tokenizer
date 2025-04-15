@@ -2,8 +2,8 @@
 BPE-Tokenizer for university module Foundational Generative Models.
 
 ## Roadmap
-- [ ] Text Loader
-- [ ] Pre-processing of words
+- [x] Text Loader
+- [x] Pre-processing of words
 - [ ] Training on English and German text
 - [ ] Trained BPE-Tokenizer
 - [ ] Conversion function from text to token
