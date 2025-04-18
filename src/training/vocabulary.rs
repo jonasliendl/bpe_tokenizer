@@ -35,6 +35,10 @@ impl Vocabulary {
     pub fn token_count(&self) -> usize {
         self.tokens.len()
     }
+
+    pub fn get_tokens(&self) -> &Vec<String> {
+        &self.tokens
+    }
 }
 
 impl Display for Vocabulary {

@@ -58,3 +58,22 @@ impl Display for TrainingError {
 }
 
 impl Error for TrainingError {}
+
+#[derive(Debug)]
+pub struct ExportError {
+    pub msg: String,
+}
+
+impl ExportError {
+    pub fn new(msg: &str) -> Self {
+        ExportError { msg: msg.to_string() }
+    }
+}
+
+impl Display for ExportError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ExportError: {}", self.msg)
+    }
+}
+
+impl Error for ExportError {}

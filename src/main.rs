@@ -4,6 +4,7 @@ mod utils;
 
 use log::LevelFilter;
 use training::{loader::{Closed, LoaderOptions, TextLoader}, Initialized};
+use utils::export::{ExportHandler, ExportTypes};
 
 use crate::training::Training;
 use crate::utils::log::SimpleLogger;
@@ -40,5 +41,13 @@ fn main() {
 
     let vocab = result_merge.get_vocabulary();
 
-    log::info!("Tokens: {}", vocab);
+    let export_handler = ExportHandler::new(ExportTypes::Text);
+    
+    match export_handler.export_vocabulary(vocab, "tokens/en_first.txt") {
+        Ok(_) => {},
+        Err(err) => {
+            log::error!("{}", err.msg);
+            return;
+        }
+    };
 }
