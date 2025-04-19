@@ -1,6 +1,6 @@
 use std::{fs::File, io::{self, BufRead, BufReader, Lines}, marker::PhantomData};
 
-use crate::utils::error::LoaderError;
+use crate::shared::error::LoaderError;
 
 pub struct Closed;
 pub struct Open;

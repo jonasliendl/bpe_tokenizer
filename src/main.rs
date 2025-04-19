@@ -1,13 +1,13 @@
 mod training;
 mod prod;
-mod utils;
+mod shared;
 
 use log::LevelFilter;
 use training::{loader::{Closed, LoaderOptions, TextLoader}, Initialized};
-use utils::export::{ExportHandler, ExportTypes};
+use shared::export::{ExportHandler, ExportTypes};
 
 use crate::training::Training;
-use crate::utils::log::SimpleLogger;
+use crate::shared::log::SimpleLogger;
 
 const LOGGER: SimpleLogger = SimpleLogger;
 
@@ -40,6 +40,8 @@ fn main() {
     };
 
     let vocab = result_merge.get_vocabulary();
+
+    log::info!("Vocabulary: {}", vocab);
 
     let export_handler = ExportHandler::new(ExportTypes::Text);
     

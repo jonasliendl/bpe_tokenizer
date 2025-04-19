@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 
-use crate::training::vocabulary::Vocabulary;
+use crate::shared::vocabulary::Vocabulary;
 
 use super::error::ExportError;
 
@@ -20,7 +20,7 @@ impl ExportHandler {
         }
     }
 
-    pub fn export_vocabulary(&self, vocabulary: Vocabulary, path: &str) -> Result<(), ExportError> {
+    pub fn export_vocabulary<S>(&self, vocabulary: Vocabulary<S>, path: &str) -> Result<(), ExportError> {
         match self.export_type {
             ExportTypes::Text => {
                 let mut file = match File::create(path) {
@@ -33,7 +33,7 @@ impl ExportHandler {
                 let tokens = vocabulary.get_tokens().clone();
 
                 for token in tokens {
-                    match writeln!(file, "{}", token) {
+                    match writeln!(file, "{}", token.get_token()) {
                         Ok(_) => {},
                         Err(err) => {
                             log::info!("Error while exporting tokens: {}", err.to_string());
