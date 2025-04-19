@@ -1,4 +1,4 @@
-use std::{fmt::Display, marker::PhantomData};
+use std::{collections::HashMap, fmt::Display, fs::File, io::BufReader, marker::PhantomData};
 
 use crate::shared::error::VocabError;
 
@@ -87,8 +87,36 @@ impl Vocabulary<Edit> {
 }
 
 impl Vocabulary<ReadOnly> {
-    pub fn from_json() -> Result<Vocabulary<ReadOnly>, VocabError> {
-        todo!()
+    pub fn from_json(path: &str) -> Result<Vocabulary<ReadOnly>, VocabError> {
+        let end = path.split(".").last();
+        if end.is_none() || end.unwrap() != "json" {
+            return Err(VocabError::new("File is not a JSON file."));
+        }
+        let file = match File::open(path) {
+            Ok(f) => f,
+            Err(err) => {
+                return Err(VocabError::new(format!("Failed to open file: {}", err).as_str()));
+            }
+        };
+
+        let reader = BufReader::new(file);
+
+        let raw_map: HashMap<String, Vec<String>> = match serde_json::from_reader(reader) {
+            Ok(m) => m,
+            Err(err) => {
+                return Err(VocabError::new(format!("Failed to parse JSON: {}", err).as_str()));
+            }
+        };
+
+        let tokens: Vec<Token> = raw_map.iter().map(|(k, v)| {
+            let pair = if v.len() == 2 { Some((v[0].clone(), v[1].clone())) } else { None };
+            Token::new(k.clone(), pair, None)
+        }).collect();
+
+        Ok(Vocabulary {
+            state: PhantomData,
+            tokens,
+        })
     }
 }
 
