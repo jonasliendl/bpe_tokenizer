@@ -16,5 +16,5 @@ This is a simple BPE-Tokenizer I've created for the electoral module Foundationa
 |✅|Add token decoding|
 |☑️|Support additional languages like Durch, Spanish, Polish, French, etc.|
 |☑️|Support additional file formats like CSV or Excel for Text Loader|
-|🕣|Convert to library|
-|☑️|Include ability to add special tokens|
+|✅|Convert to library|
+|🕣|Include ability to add special tokens|

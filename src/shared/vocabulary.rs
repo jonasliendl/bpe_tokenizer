@@ -1,4 +1,4 @@
-use std::{collections::{BTreeMap, HashMap}, fmt::Display, fs::File, io::{BufReader, BufWriter}, marker::PhantomData};
+use std::{collections::HashMap, fmt::Display, fs::File, io::{BufReader, BufWriter}, marker::PhantomData};
 
 use serde::{Deserialize, Serialize};
 
