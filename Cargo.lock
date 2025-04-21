@@ -6,17 +6,10 @@ version = 4
 name = "bpe_tokenizer"
 version = "0.1.0"
 dependencies = [
- "deunicode",
  "log",
  "serde",
  "serde_json",
 ]
-
-[[package]]
-name = "deunicode"
-version = "1.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc55fe0d1f6c107595572ec8b107c0999bb1a2e0b75e37429a4fb0d6474a0e7d"
 
 [[package]]
 name = "itoa"

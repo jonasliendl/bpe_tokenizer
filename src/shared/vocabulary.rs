@@ -10,18 +10,18 @@ use super::error::ExportError;
 pub struct Token {
     token: String,
     token_id: usize,
-    pair: Option<(String, String)>,
+    pair: Option<(usize, usize)>,
     occurrences: usize,
 }
 
 #[derive(Serialize, Deserialize)]
 struct TokenInfo {
     pub token: String,
-    pub pair: Vec<String>,
+    pub pair: Vec<usize>,
 }
 
 impl Token {
-    pub fn new(token: String, token_id: usize, pair: Option<(String, String)>, occurrence: Option<usize>) -> Self {
+    pub fn new(token: String, token_id: usize, pair: Option<(usize, usize)>, occurrence: Option<usize>) -> Self {
         Token { token, token_id, pair, occurrences: occurrence.unwrap_or(1) }
     }
 
@@ -41,7 +41,7 @@ impl Token {
         self.occurrences
     }
 
-    pub fn get_pair(&self) -> Option<(String, String)> {
+    pub fn get_pair(&self) -> Option<(usize, usize)> {
         self.pair.clone()
     }
 
@@ -63,11 +63,26 @@ pub struct Vocabulary<S> {
 }
 
 impl<S> Vocabulary<S> {
+    fn initialize_letters(&mut self) {
+        for i in 0..=255 {
+            let parsed_token = String::from_utf8_lossy(&vec![i]).to_string();
+            let token = Token::new(
+                parsed_token,
+                i as usize,
+                None,
+                None,
+            );
+            self.tokens.push(token);
+        }
+    }
+
     pub fn new() -> Vocabulary<Edit> {
-        Vocabulary {
+        let mut vocab = Vocabulary {
             tokens: Vec::new(),
             state: PhantomData,
-        }
+        };
+        vocab.initialize_letters();
+        vocab
     }
 
     pub fn token_count(&self) -> usize {
@@ -120,9 +135,8 @@ impl<S> Vocabulary<S> {
 
 impl Vocabulary<Edit> {
     pub fn add(&mut self, token: Token) -> Result<(), VocabError> {
-        let tokens: Vec<String> = self.tokens.iter().map(|x| x.token.clone()).collect();
-        if tokens.contains(&token.token) {
-            return Err(VocabError::new(format!("Token {} is already part of the vocabulary.", token.token).as_str()));
+        if self.tokens.iter().any(|x| x.pair == token.pair && x.token == token.token) {
+            return Err(VocabError::new("Token already exists."));
         }
 
         self.tokens.push(token);
@@ -131,10 +145,10 @@ impl Vocabulary<Edit> {
     }
 
     pub fn append(&mut self, token_list: Vec<Token>) {
-        let tokens: Vec<String> = self.tokens.iter().map(|x| x.token.clone()).collect();
         for token in token_list {
-            if !tokens.contains(&token.token) {
-                self.tokens.push(token);
+            match self.add(token) {
+                Ok(_) => {},
+                Err(_) => {}
             }
         }
     }

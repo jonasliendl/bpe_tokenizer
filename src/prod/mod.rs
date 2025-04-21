@@ -11,8 +11,8 @@ impl Tokenizer {
         Tokenizer { vocabulary }
     }
 
-    pub fn tokenize(&self, text: String) -> Vec<String> {
-        let mut result: Vec<String> = Vec::new();
+    pub fn tokenize(&self, text: String) -> Vec<usize> {
+        let mut result: Vec<usize> = Vec::new();
 
         let binding = text.replace("\n", "\n ");
         let words = binding.split_whitespace();
@@ -20,7 +20,7 @@ impl Tokenizer {
         for word in words {
             match self.vocabulary.get_tokens().iter().find(|x| x.get_token() == word) {
                 Some(token) => {
-                    result.push(token.get_token().to_string());
+                    result.push(token.get_token_id());
                 }
                 None => {
                     let sub_tokens = self.tokenize_using_merge(word.to_string());
@@ -32,9 +32,12 @@ impl Tokenizer {
         result
     }
 
-    fn tokenize_using_merge(&self, text: String) -> Vec<String> {
-        let tokens: Vec<String> = text.chars().map(|x| x.to_string()).collect();
-        let mut result: Vec<String> = Vec::new();
+    fn tokenize_using_merge(&self, text: String) -> Vec<usize> {
+        let tokens: Vec<usize> = text.as_bytes()
+            .iter()
+            .map(|x| *x as usize)
+            .collect();
+        let mut result: Vec<usize> = Vec::new();
 
         let binding = self.vocabulary.get_tokens();
         let merge_pairs: Vec<&Token> = binding.iter().filter(|x| x.get_pair().is_some()).collect();
@@ -46,7 +49,7 @@ impl Tokenizer {
                 let pair = (tokens[idx].clone(), tokens[idx + 1].clone());
                 match merge_pairs.iter().find(|x| x.get_pair().eq(&Some(pair.clone()))) {
                     Some(tkn) => {
-                        result.push(tkn.get_token().to_string());
+                        result.push(tkn.get_token_id());
                         idx += 2;
                     },
                     None => {

@@ -22,7 +22,7 @@ fn main() {
 
     let loader: TextLoader<Closed> = TextLoader::new(LoaderOptions::TXT, path);
 
-    let trainer: Training<Initialized> = Training::new(loader);
+    let trainer: Training<Initialized> = Training::new(loader, None);
 
     let result_read = match trainer.start_training() {
         Ok(res) => res,
@@ -59,7 +59,6 @@ fn main() {
     };
 
     log::info!("Vocabulary size: {}", read_vocab.token_count());
-    log::info!("Tokens: {}", read_vocab);
 
     let example_text = "This is a test text for the tokenizer. It should be able to handle this text correctly.";
 
