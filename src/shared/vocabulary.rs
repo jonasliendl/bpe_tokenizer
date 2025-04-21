@@ -1,17 +1,28 @@
-use std::{collections::HashMap, fmt::Display, fs::File, io::BufReader, marker::PhantomData};
+use std::{collections::HashMap, fmt::Display, fs::File, io::{BufReader, BufWriter}, marker::PhantomData};
+
+use serde::{Deserialize, Serialize};
 
 use crate::shared::error::VocabError;
+
+use super::error::ExportError;
 
 #[derive(Clone, Debug)]
 pub struct Token {
     token: String,
+    token_id: usize,
     pair: Option<(String, String)>,
     occurrences: usize,
 }
 
+#[derive(Serialize, Deserialize)]
+struct TokenInfo {
+    pub token: String,
+    pub pair: Vec<String>,
+}
+
 impl Token {
-    pub fn new(token: String, pair: Option<(String, String)>, occurrence: Option<usize>) -> Self {
-        Token { token, pair, occurrences: occurrence.unwrap_or(1) }
+    pub fn new(token: String, token_id: usize, pair: Option<(String, String)>, occurrence: Option<usize>) -> Self {
+        Token { token, token_id, pair, occurrences: occurrence.unwrap_or(1) }
     }
 
     pub fn increase_occurrence(&mut self, occurrence: Option<usize>) {
@@ -32,6 +43,10 @@ impl Token {
 
     pub fn get_pair(&self) -> Option<(String, String)> {
         self.pair.clone()
+    }
+
+    pub fn get_token_id(&self) -> usize {
+        self.token_id
     }
 }
 
@@ -61,6 +76,45 @@ impl<S> Vocabulary<S> {
 
     pub fn get_tokens(&self) -> Vec<Token> {
         self.tokens.clone()
+    }
+
+    pub fn to_json(&self, path: &str) -> Result<(), ExportError> {
+        if path.split(".").last() != Some("json") {
+            return Err(ExportError::new("File extension must be .json"));
+        }
+        let file = match File::create(path) {
+            Ok(f) => f,
+            Err(err) => {
+                return Err(ExportError::new(err.to_string().as_str()));
+            }
+        };
+
+        let writer = BufWriter::new(file);
+
+        let mut raw_map: HashMap<String, TokenInfo> = HashMap::new();
+
+        for token in &self.tokens {
+            let pair = match token.get_pair() {
+                Some(pair) => vec![pair.0, pair.1],
+                None => Vec::new(),
+            };
+            raw_map.insert(token.token_id.to_string(), TokenInfo { token: token.token.clone(), pair });
+        }
+
+        match serde_json::to_writer_pretty(writer, &raw_map) {
+            Ok(_) => {},
+            Err(err) => {
+                return Err(ExportError::new(format!("Failed to write JSON: {}", err).as_str()));
+            }
+        };
+        Ok(())
+    }
+
+    pub fn get_last_id(&self) -> usize {
+        if self.tokens.is_empty() {
+            return 0;
+        }
+        self.tokens.last().unwrap().token_id
     }
 }
 
@@ -101,7 +155,7 @@ impl Vocabulary<ReadOnly> {
 
         let reader = BufReader::new(file);
 
-        let raw_map: HashMap<String, Vec<String>> = match serde_json::from_reader(reader) {
+        let raw_map: HashMap<String, TokenInfo> = match serde_json::from_reader(reader) {
             Ok(m) => m,
             Err(err) => {
                 return Err(VocabError::new(format!("Failed to parse JSON: {}", err).as_str()));
@@ -109,8 +163,9 @@ impl Vocabulary<ReadOnly> {
         };
 
         let tokens: Vec<Token> = raw_map.iter().map(|(k, v)| {
-            let pair = if v.len() == 2 { Some((v[0].clone(), v[1].clone())) } else { None };
-            Token::new(k.clone(), pair, None)
+            let pair = if v.pair.len() == 2 { Some((v.pair[0].clone(), v.pair[1].clone())) } else { None };
+            let token_id = k.parse::<usize>().unwrap_or(0);
+            Token::new(v.token.clone(), token_id, pair, None)
         }).collect();
 
         Ok(Vocabulary {

@@ -5,7 +5,7 @@ mod shared;
 use log::LevelFilter;
 use prod::Tokenizer;
 use training::{loader::{Closed, LoaderOptions, TextLoader}, Initialized};
-use shared::{export::{ExportHandler, ExportTypes}, vocabulary::Vocabulary};
+use shared::vocabulary::Vocabulary;
 
 use crate::training::Training;
 use crate::shared::log::SimpleLogger;
@@ -18,39 +18,37 @@ fn main() {
         return;
     }
 
-    // let path = "data/en.txt";
+    let path = "data/en.txt";
 
-    // let loader: TextLoader<Closed> = TextLoader::new(LoaderOptions::TXT, path);
+    let loader: TextLoader<Closed> = TextLoader::new(LoaderOptions::TXT, path);
 
-    // let trainer: Training<Initialized> = Training::new(loader);
+    let trainer: Training<Initialized> = Training::new(loader);
 
-    // let result_read = match trainer.start_training() {
-    //     Ok(res) => res,
-    //     Err(err) => {
-    //         println!("Error: {}", err);
-    //         return;
-    //     }
-    // };
+    let result_read = match trainer.start_training() {
+        Ok(res) => res,
+        Err(err) => {
+            println!("Error: {}", err);
+            return;
+        }
+    };
 
-    // let result_merge = match result_read.start_merge() {
-    //     Ok(res) => res,
-    //     Err(err) => {
-    //         println!("Error: {}", err);
-    //         return;
-    //     }
-    // };
+    let result_merge = match result_read.start_merge() {
+        Ok(res) => res,
+        Err(err) => {
+            println!("Error: {}", err);
+            return;
+        }
+    };
 
-    // let vocab = result_merge.get_vocabulary();
+    let vocab = result_merge.get_vocabulary();
 
-    // let export_handler = ExportHandler::new(ExportTypes::JSON);
-    
-    // match export_handler.export_vocabulary(vocab, "tokens/en_first.json") {
-    //     Ok(_) => {},
-    //     Err(err) => {
-    //         log::error!("{}", err.msg);
-    //         return;
-    //     }
-    // };
+    match vocab.to_json("tokens/en_first.json") {
+        Ok(_) => {},
+        Err(err) => {
+            log::error!("{}", err.msg);
+            return;
+        }
+    };
 
     let read_vocab = match Vocabulary::from_json("tokens/en_first.json") {
         Ok(vocab) => vocab,
@@ -69,4 +67,10 @@ fn main() {
     let tokens = tokenizer.tokenize(example_text.to_string());
 
     log::info!("Tokens: {:?}", tokens);
+
+    let case_sensitivity_example = "This should be different to this. IS is not Is.";
+
+    let tokens_2 = tokenizer.tokenize(case_sensitivity_example.to_string());
+
+    log::info!("Tokens (Case Sensitivity test): {:?}", tokens_2);
 }

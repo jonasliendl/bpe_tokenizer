@@ -59,9 +59,10 @@ impl Training<Initialized> {
                     },
                     None => {
                         let mut parsed_word = Word::new(word, None);
+                        let token_id = vocab.get_last_id() + 1;
                         let letters: Vec<Token> = parsed_word.letters
                             .iter_mut()
-                            .map(|x| Token::new(x.clone(), None, None))
+                            .map(|x| Token::new(x.clone(), token_id, None, None))
                             .collect();
                         vocab.append(letters);
                         words.insert(word.to_string(), parsed_word);
@@ -87,7 +88,6 @@ impl Training<DoneReading> {
 
         let mut tokens_map: HashMap<String, Token> = HashMap::new();
 
-        //let mut combinations: HashMap<(String, String), usize> = HashMap::new();
         let mut words = self.word_data;
 
         let mut prev_token_count = 1;
@@ -107,8 +107,10 @@ impl Training<DoneReading> {
                                 token.increase_occurrence(Some(word.1.occurence_count));
                             },
                             None => {
+                                let token_id = self.vocabulary.get_last_id() + 1;
                                 let token = Token::new(
                                     merged_pair.clone(), 
+                                    token_id,
                                     Some((letters[0].to_string(), letters[1].to_string())), 
                                     Some(word.1.occurence_count)
                                 );

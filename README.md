@@ -9,7 +9,7 @@ This is a simple BPE-Tokenizer I've created for the electoral module Foundationa
 |✅|Tokenize text function|
 |✅|Export function for vocabulary|
 |☑️|Website to show off tokenizer|
-|🕣|Support Case-Sensitivity|
+|✅|Support Case-Sensitivity|
 |🕣|Support UTF-8 text|
 |☑️|Handle unknown characters using the Out-of-Vocabulary method|
 |☑️|Train Tokenizer on English and German text|
