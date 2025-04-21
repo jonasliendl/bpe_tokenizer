@@ -42,7 +42,6 @@ impl TextLoader<Closed> {
         let file = match File::open(&self.path) {
             Ok(f) => f,
             Err(e) => {
-                log::error!("Unable to open TXT file: {}", e);
                 return Err(LoaderError::new(format!("Unable to open file: {}", e).as_str()));
             },
         };

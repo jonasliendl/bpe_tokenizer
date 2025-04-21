@@ -88,8 +88,6 @@ impl Training<DoneReading> {
         let mut prev_token_count = 1;
 
         while self.token_limit > self.vocabulary.token_count() && prev_token_count != self.vocabulary.token_count() {
-            let progress = (self.vocabulary.token_count() as f32 / self.token_limit as f32)*100.0;
-            log::info!("Progress: {:.2}%", progress);
             tokens.clear();
             prev_token_count = self.vocabulary.token_count();
             for word in &words {
@@ -133,8 +131,7 @@ impl Training<DoneReading> {
                 Some(item) => {
                     match self.vocabulary.add(item.clone()) {
                         Ok(_) => {},
-                        Err(e) => {
-                            log::error!("Error adding {} to vocabulary: {}", item.get_token(), e);
+                        Err(_) => {
                             continue;
                         }
                     };
@@ -142,7 +139,6 @@ impl Training<DoneReading> {
                         let pair = match item.get_pair() {
                             Some(p) => p,
                             None => {
-                                log::error!("Error: no pair found for token {}", item.get_token());
                                 return;
                             }
                         };

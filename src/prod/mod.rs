@@ -1,5 +1,3 @@
-// TODO: how to deal with multiple languages?
-
 use crate::shared::vocabulary::{ReadOnly, Token, Vocabulary};
 
 pub struct Tokenizer {

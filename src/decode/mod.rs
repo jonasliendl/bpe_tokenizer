@@ -18,7 +18,7 @@ impl Decoder {
                     result.push_str(&tkn.get_token());
                 }
                 None => {
-                    log::warn!("Token ID {} not found in vocabulary", token);
+                    result.push_str("<unknown>");
                 }
             }
         }

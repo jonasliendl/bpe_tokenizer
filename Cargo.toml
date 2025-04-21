@@ -2,9 +2,10 @@
 name = "bpe_tokenizer"
 version = "0.1.0"
 edition = "2024"
+authors = ["Jonas Liendl"]
+description = "A simple BPE tokenizer for Rust"
+license = "MIT"
 
 [dependencies]
-chrono = "0.4.40"
-log = "0.4.27"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
