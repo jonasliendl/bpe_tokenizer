@@ -1,6 +1,7 @@
 mod training;
 mod prod;
 mod shared;
+mod decode;
 
 use log::LevelFilter;
 use prod::Tokenizer;
@@ -24,6 +25,7 @@ fn main() {
 
     let trainer: Training<Initialized> = Training::new(loader, None);
 
+    let training_start = chrono::Utc::now();
     let result_read = match trainer.start_training() {
         Ok(res) => res,
         Err(err) => {
@@ -39,6 +41,11 @@ fn main() {
             return;
         }
     };
+    let training_end = chrono::Utc::now();
+
+    let duration = training_end - training_start;
+
+    log::info!("Training completed in: {} seconds", duration.num_seconds());
 
     let vocab = result_merge.get_vocabulary();
 
@@ -61,15 +68,20 @@ fn main() {
     log::info!("Vocabulary size: {}", read_vocab.token_count());
 
     let example_text = "This is a test text for the tokenizer. It should be able to handle this text correctly.";
+    log::info!("Example text: {}", example_text);
 
-    let tokenizer = Tokenizer::new(read_vocab);
+    let tokenization_start = chrono::Utc::now();
+    let tokenizer = Tokenizer::new(read_vocab.clone());
     let tokens = tokenizer.tokenize(example_text.to_string());
+    let tokenization_end = chrono::Utc::now();
+
+    let tokenization_duration = tokenization_end - tokenization_start;
+
+    log::info!("Tokenization completed in: {} seconds", tokenization_duration.num_seconds());
 
     log::info!("Tokens: {:?}", tokens);
 
-    let case_sensitivity_example = "This should be different to this. IS is not Is.";
-
-    let tokens_2 = tokenizer.tokenize(case_sensitivity_example.to_string());
-
-    log::info!("Tokens (Case Sensitivity test): {:?}", tokens_2);
+    let decoder = decode::Decoder::new(read_vocab);
+    let decoded_text = decoder.decode(tokens.clone());
+    log::info!("Decoded text: {}", decoded_text);
 }

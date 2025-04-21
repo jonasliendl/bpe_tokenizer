@@ -15,7 +15,7 @@ impl Tokenizer {
         let mut result: Vec<usize> = Vec::new();
 
         let binding = text.replace("\n", "\n ");
-        let words = binding.split_whitespace();
+        let words = binding.split_inclusive(' ');
 
         for word in words {
             match self.vocabulary.get_tokens().iter().find(|x| x.get_token() == word) {

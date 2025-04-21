@@ -12,7 +12,9 @@ This is a simple BPE-Tokenizer I've created for the electoral module Foundationa
 |✅|Support Case-Sensitivity|
 |✅|Support UTF-8 text|
 |☑️|Handle unknown characters using the Out-of-Vocabulary method|
-|☑️|Train Tokenizer on English and German text|
-|🕣|Add token decoding|
+|🕣|Train Tokenizer on English and German text|
+|✅|Add token decoding|
 |☑️|Support additional languages like Durch, Spanish, Polish, French, etc.|
 |☑️|Support additional file formats like CSV or Excel for Text Loader|
+|🕣|Convert to library|
+|☑️|Include ability to add special tokens|

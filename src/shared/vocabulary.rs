@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display, fs::File, io::{BufReader, BufWriter}, marker::PhantomData};
+use std::{collections::{BTreeMap, HashMap}, fmt::Display, fs::File, io::{BufReader, BufWriter}, marker::PhantomData};
 
 use serde::{Deserialize, Serialize};
 
@@ -63,6 +63,10 @@ pub struct Vocabulary<S> {
 }
 
 impl<S> Vocabulary<S> {
+    fn sort_tokens(&mut self) {
+        self.tokens.sort_by(|a, b| a.token_id.cmp(&b.token_id));
+    }
+
     fn initialize_letters(&mut self) {
         for i in 0..=255 {
             let parsed_token = String::from_utf8_lossy(&vec![i]).to_string();
@@ -82,6 +86,7 @@ impl<S> Vocabulary<S> {
             state: PhantomData,
         };
         vocab.initialize_letters();
+        vocab.sort_tokens();
         vocab
     }
 
@@ -130,6 +135,16 @@ impl<S> Vocabulary<S> {
             return 0;
         }
         self.tokens.last().unwrap().token_id
+    }
+
+    pub fn find_token(&self, token_id: usize) -> Option<&Token> {
+        self.tokens.binary_search_by(|x| x.token_id.cmp(&token_id)).ok().and_then(|idx| {
+            if idx < self.tokens.len() {
+                Some(&self.tokens[idx])
+            } else {
+                None
+            }
+        })
     }
 }
 

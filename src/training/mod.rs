@@ -54,7 +54,7 @@ impl Training<Initialized> {
                 }
             };
 
-            for word in ln.split_whitespace() {
+            for word in ln.split_inclusive(' ') {
                 match words.get_mut(word) {
                     Some(wrd) => {
                         wrd.increase_occurence();
@@ -98,18 +98,17 @@ impl Training<DoneReading> {
                         let letters = &word.1.letters[i-1..i+1];
                         let merged_pair = (letters[0], letters[1]);
                         match tokens.iter_mut().find(|x| x.get_pair() == Some(merged_pair)) {
-                            Some(token)  => {
+                            Some(token) => {
                                 token.increase_occurrence(Some(word.1.occurence_count));
                             },
                             None => {
-                                let vocab_tokens = self.vocabulary.get_tokens();
-                                let first_token = match vocab_tokens.iter().find(|x| x.get_token_id() == letters[0]) {
+                                let first_token = match self.vocabulary.find_token(letters[0]) {
                                     Some(tkn) => tkn,
                                     None => {
                                         continue;
                                     }
                                 };
-                                let second_token = match vocab_tokens.iter().find(|x| x.get_token_id() == letters[1]) {
+                                let second_token = match self.vocabulary.find_token(letters[1]) {
                                     Some(tkn) => tkn,
                                     None => {
                                         continue;
