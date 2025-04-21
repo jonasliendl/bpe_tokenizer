@@ -22,8 +22,8 @@ impl Token {
         }
     }
 
-    pub fn get_token(&self) -> &String {
-        &self.token
+    pub fn get_token(&self) -> String {
+        self.token.clone()
     }
 
     pub fn get_occurrence(&self) -> usize {

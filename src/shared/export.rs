@@ -1,12 +1,13 @@
+use std::collections::HashMap;
 use std::fs::File;
-use std::io::Write;
+use std::io::BufWriter;
 
 use crate::shared::vocabulary::Vocabulary;
 
 use super::error::ExportError;
 
 pub enum ExportTypes {
-    Text,
+    JSON,
 }
 
 pub struct ExportHandler {
@@ -22,25 +23,35 @@ impl ExportHandler {
 
     pub fn export_vocabulary<S>(&self, vocabulary: Vocabulary<S>, path: &str) -> Result<(), ExportError> {
         match self.export_type {
-            ExportTypes::Text => {
-                let mut file = match File::create(path) {
+            ExportTypes::JSON => {
+                if path.split(".").last() != Some("json") {
+                    return Err(ExportError::new("File extension must be .json"));
+                }
+                let file = match File::create(path) {
                     Ok(f) => f,
                     Err(err) => {
                         return Err(ExportError::new(err.to_string().as_str()));
                     }
                 };
 
-                let tokens = vocabulary.get_tokens().clone();
+                let writer = BufWriter::new(file);
 
-                for token in tokens {
-                    match writeln!(file, "{}", token.get_token()) {
-                        Ok(_) => {},
-                        Err(err) => {
-                            log::info!("Error while exporting tokens: {}", err.to_string());
-                            return Err(ExportError::new(err.to_string().as_str()));
-                        },
+                let mut raw_map: HashMap<String, Vec<String>> = HashMap::new();
+
+                for token in vocabulary.get_tokens() {
+                    let pair = match token.get_pair() {
+                        Some(pair) => vec![pair.0, pair.1],
+                        None => Vec::new(),
                     };
+                    raw_map.insert(token.get_token().to_string(), pair);
                 }
+
+                match serde_json::to_writer_pretty(writer, &raw_map) {
+                    Ok(_) => {},
+                    Err(err) => {
+                        return Err(ExportError::new(format!("Failed to write JSON: {}", err).as_str()));
+                    }
+                };
             }
         }
         Ok(())
