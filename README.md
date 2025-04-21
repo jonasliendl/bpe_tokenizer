@@ -6,7 +6,7 @@ This is a simple BPE-Tokenizer I've created for the electoral module Foundationa
 |---|---|
 |✅|Text Loader supporting .TXT files|
 |✅|Training process function|
-|🕣|Tokenize text function|
+|✅|Tokenize text function|
 |✅|Export function for vocabulary|
 |☑️|Website to show off tokenizer|
 |🕣|Support Case-Sensitivity|
@@ -16,4 +16,3 @@ This is a simple BPE-Tokenizer I've created for the electoral module Foundationa
 |☑️|Add token decoding|
 |☑️|Support additional languages like Durch, Spanish, Polish, French, etc.|
 |☑️|Support additional file formats like CSV or Excel for Text Loader|
- 
